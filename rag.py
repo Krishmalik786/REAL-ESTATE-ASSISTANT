@@ -12,6 +12,9 @@ from langchain_core.output_parsers import StrOutputParser
 
 load_dotenv()
 
+import nltk
+nltk.download('punkt_tab')
+
 CHUNK_SIZE = 1000
 EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
 
@@ -27,7 +30,7 @@ embeddings = HuggingFaceEmbeddings(model_name=EMBEDDING_MODEL)
 vectorstore = Chroma(
     collection_name="real_estate",
     embedding_function=embeddings,
-    persist_directory=str(persist_dir)
+    persist_directory=None  # Use in-memory for Streamlit Cloud
 )
 
 
@@ -39,7 +42,7 @@ def ingest(urls):
     docs = splitter.split_documents(data)
 
     vectorstore.add_documents(docs)
-    vectorstore.persist()
+    # No persist needed for in-memory
 
     print("Ingestion complete!")
 
