@@ -22,9 +22,6 @@ except:
 CHUNK_SIZE = 1000
 EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
 
-# Initialize LLM
-llm = ChatGroq(model="llama-3.3-70b-versatile", temperature=0.2)
-
 
 def ingest(urls):
     # Embeddings
@@ -54,6 +51,9 @@ def ingest(urls):
 def ask(query):
     if 'vectorstore' not in st.session_state:
         raise ValueError("Please ingest URLs first.")
+
+    # Initialize LLM
+    llm = ChatGroq(model="llama-3.3-70b-versatile", temperature=0.2)
 
     retriever = st.session_state.vectorstore.as_retriever()
 

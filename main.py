@@ -1,4 +1,10 @@
 import streamlit as st
+import os
+
+# Set API key from secrets
+if 'GROQ_API_KEY' in st.secrets:
+    os.environ['GROQ_API_KEY'] = st.secrets['GROQ_API_KEY']
+
 from rag import ingest, ask
 
 st.title("Real Estate Assistant")
