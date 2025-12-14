@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 
 from langchain_groq import ChatGroq
 from langchain_huggingface.embeddings import HuggingFaceEmbeddings
-from langchain_community.document_loaders import SeleniumURLLoader
+from langchain_community.document_loaders import WebBaseLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import Chroma
 
@@ -35,7 +35,7 @@ vectorstore = Chroma(
 
 
 def ingest(urls):
-    loader = SeleniumURLLoader(urls=urls)
+    loader = WebBaseLoader(urls)
     data = loader.load()
 
     splitter = RecursiveCharacterTextSplitter(chunk_size=CHUNK_SIZE)
