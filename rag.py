@@ -1,4 +1,3 @@
-from pathlib import Path
 from dotenv import load_dotenv
 
 from langchain_groq import ChatGroq
@@ -10,31 +9,34 @@ from langchain_community.vectorstores import Chroma
 from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 
+import streamlit as st
+
 load_dotenv()
 
-import nltk
-nltk.download('punkt_tab')
+try:
+    import nltk
+    nltk.download('punkt_tab')
+except:
+    pass  # Skip if download fails
 
 CHUNK_SIZE = 1000
 EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
 
-persist_dir = Path("resources/vectorstore")
-
 # Initialize LLM
 llm = ChatGroq(model="llama-3.3-70b-versatile", temperature=0.2)
 
-# Embeddings
-embeddings = HuggingFaceEmbeddings(model_name=EMBEDDING_MODEL)
-
-# Vector DB
-vectorstore = Chroma(
-    collection_name="real_estate",
-    embedding_function=embeddings,
-    persist_directory=None  # Use in-memory for Streamlit Cloud
-)
-
 
 def ingest(urls):
+    # Embeddings
+    embeddings = HuggingFaceEmbeddings(model_name=EMBEDDING_MODEL)
+
+    # Vector DB
+    vectorstore = Chroma(
+        collection_name="real_estate",
+        embedding_function=embeddings,
+        persist_directory=None  # Use in-memory for Streamlit Cloud
+    )
+
     loader = WebBaseLoader(urls)
     data = loader.load()
 
@@ -44,11 +46,16 @@ def ingest(urls):
     vectorstore.add_documents(docs)
     # No persist needed for in-memory
 
+    st.session_state.vectorstore = vectorstore
+
     print("Ingestion complete!")
 
 
 def ask(query):
-    retriever = vectorstore.as_retriever()
+    if 'vectorstore' not in st.session_state:
+        raise ValueError("Please ingest URLs first.")
+
+    retriever = st.session_state.vectorstore.as_retriever()
 
     # Retrieval step
     retrieved_docs = retriever.invoke(query)
