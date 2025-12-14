@@ -3,9 +3,9 @@ __pycache__/
 *.pyc
 .DS_Store
 resources/vectorstore/
-.cache/
+cache/
 .ipynb_checkpoints/
 *.db
 *.bin
 *.pkl
-.env
+*.env
